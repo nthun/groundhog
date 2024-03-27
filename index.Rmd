@@ -16,7 +16,15 @@ theme_set(theme_light())
 
 ```
 
+# Aims
+
+This is an example project to show how to make a data analysis project in RMarkdown and use github for version control.
+We will focus on exploration of the data.
+
+
 # Reading the data
+
+There are two datasets, one about groundhogs, the other about groundhog predictions. The two detasets can be linked by a unique id.
 
 ```{r}
 groundhogs <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2024/2024-01-30/groundhogs.csv')
@@ -24,7 +32,7 @@ predictions <- readr::read_csv('https://raw.githubusercontent.com/rfordatascienc
 
 ```
 
-## How many groundhogs in each region
+# How many groundhogs in each region?
 
 ```{r}
 
@@ -40,7 +48,7 @@ groundhogs |>
     ggplot() +
     aes(y = region, x = n) +
     geom_col() +
-    labs(y = NULL)
+    labs(y = NULL, title = "Number of groundhogs by region")
 
 
 ```
@@ -50,7 +58,7 @@ groundhogs |> count(country)
 
 ```
 
-Create a new dataset where groundhogs are joined to predictions
+Create a new dataset where groundhogs are joined to predictions, also a dataset that contains the proportion of shadows to all predictions.
 
 ```{r}
 
@@ -61,7 +69,8 @@ gh_pred <-
 
 shadow_pred <- 
     gh_pred |> 
-    group_by(id) |> 
+    group_by(id) |>
+    # For logical variables, the mean of predictions will result the proportion of TRUE-s to all preds.
     summarise(prop_shadow = mean(shadow, na.rm = TRUE))
 
 gh_pred |> 
@@ -71,7 +80,8 @@ gh_pred |>
             name = fct_reorder(name, start)) |> 
     ggplot() +
     aes(y = name) +
-    geom_point(aes(x = start))
+    geom_point(aes(x = start)) +
+    labs(y = NULL, title = "When did each groundhog started to predict spring?")
 
 ```
 
@@ -84,9 +94,11 @@ gh_pred |>
               end = max(year)) |> 
     ggplot() +
     aes(y = id, yend = id, x = start, xend = end) +
-    geom_segment()
+    geom_segment() +
+    labs(title = "Groundhog active years")
 ```
 
+# Create a map of US groundhogs
 
 ```{r}
 
@@ -108,10 +120,9 @@ usa_map |>
     labs(x = NULL, y = NULL, size = "# of predictions", alpha = "# of predictions",
          title = "USA groundog sites")
 
-
 ```
 
-
+# Map the US predictions along with groundhog sites
 
 ```{r}
 
